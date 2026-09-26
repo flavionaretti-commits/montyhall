@@ -121,6 +121,44 @@
       main{padding-left:.55rem;padding-right:.55rem}.doors{gap:.32rem}.card{border-radius:19px}
       .behind{font-size:3.35rem}.door{border-width:4px}.brand{font-size:1rem}.round{width:38px;height:38px}
     }
+    /* Vista orizzontale compatta: le tre porte restano interamente visibili */
+    @media (orientation: landscape) and (max-height:650px){
+      .topbar{
+        padding:max(.28rem,env(safe-area-inset-top)) .65rem .28rem;
+        gap:.4rem;
+      }
+      .round{width:34px;height:34px;font-size:1rem}
+      .brand{font-size:1rem}
+      main{padding:.35rem .7rem calc(.7rem + env(safe-area-inset-bottom))}
+      .hero{display:none}
+      .tabs{margin:0 auto .45rem;gap:.4rem;max-width:620px}
+      .tab{padding:.48rem .7rem;border-radius:11px;font-size:.88rem}
+      .card{padding:.55rem .75rem;border-radius:16px}
+      .game-head{min-height:32px;gap:.45rem}
+      .instruction{font-size:.95rem}
+      #resetStatsBtn{padding:.42rem .65rem;font-size:.8rem}
+      .doors{
+        gap:clamp(.55rem,4vw,2.2rem);
+        margin:.38rem auto .25rem;
+        max-width:700px;
+        align-items:start;
+      }
+      .door-stage{
+        width:min(100%, calc((100dvh - 190px) * .66), 150px);
+        margin-inline:auto;
+        max-height:none;
+      }
+      .door-num{margin-top:.22rem;font-size:.78rem}
+      .behind{font-size:clamp(2.3rem,8vh,4rem)}
+      .actions{margin:.35rem 0;gap:.5rem}
+      .primary,.secondary{padding:.55rem .8rem;border-radius:11px;font-size:.88rem}
+      .result-banner{margin:.35rem auto 0;padding:.48rem .7rem;font-size:.88rem}
+      .stats{margin-top:.45rem;gap:.45rem}
+      .statbox{padding:.45rem;font-size:.78rem}
+      .statbox b{font-size:.95rem;margin-top:.15rem}
+      .footer{display:none}
+    }
+
   </style>
 </head>
 <body>
