@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#14213d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Monty Hall">
+  <title>MONTY HALL!</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    :root{
+      --bg:#f5efe2; --panel:#fffaf0; --ink:#182033; --muted:#657084;
+      --accent:#e76f51; --accent2:#2a9d8f; --gold:#e9c46a; --blue:#457b9d;
+      --door:#a65a2e; --door2:#6f351d; --line:#d8ccb9; --shadow:0 14px 35px #27324a22;
+      --good:#2a9d5b; --bad:#cf4d4d;
+    }
+    body.dark{
+      --bg:#0f172a; --panel:#162033; --ink:#f4f0e8; --muted:#a9b2c4;
+      --accent:#ff7b61; --accent2:#44c2b4; --gold:#f0c96b; --blue:#70b7dc;
+      --door:#a85f37; --door2:#5a2e1c; --line:#33415c; --shadow:0 18px 42px #0007;
+      --good:#58c77d; --bad:#ff7676;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;font-family:ui-rounded,"SF Pro Rounded","Avenir Next",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+    body{min-height:100dvh;overflow-x:hidden;transition:.25s background,.25s color}
+    button,input{font:inherit}
+    button{touch-action:manipulation}
+    .topbar{
+      position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:.55rem;
+      padding:max(.55rem,env(safe-area-inset-top)) .8rem .55rem;
+      background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--line)
+    }
+    .brand{font-weight:1000;letter-spacing:.04em;flex:1;font-size:clamp(1.05rem,4vw,1.55rem)}
+    .brand span{color:var(--accent)}
+    .round{
+      width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+      box-shadow:0 3px 10px #0001;font-size:1.15rem;display:grid;place-items:center;cursor:pointer
+    }
+    main{width:min(1100px,100%);margin:auto;padding:1rem .9rem calc(1.5rem + env(safe-area-inset-bottom))}
+    .hero{text-align:center;padding:.6rem 0 1rem}
+    .hero h1{font-size:clamp(2rem,8vw,4.2rem);line-height:.95;margin:.3rem 0;color:var(--ink);letter-spacing:-.04em}
+    .hero p{max-width:730px;margin:.55rem auto;color:var(--muted);font-weight:650}
+    .tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;max-width:720px;margin:0 auto 1rem}
+    .tab,.primary,.secondary,.strategy,.nbtn{
+      border:0;border-radius:15px;padding:.85rem 1rem;font-weight:900;cursor:pointer;transition:.18s transform,.18s filter,.18s background;
+    }
+    .tab:active,.primary:active,.secondary:active,.strategy:active,.nbtn:active{transform:scale(.97)}
+    .tab{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+    .tab.active{background:var(--ink);color:var(--bg)}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:clamp(.9rem,3vw,1.4rem)}
+    .hidden{display:none!important}
+    .game-head{display:flex;gap:.7rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .instruction{font-size:clamp(1rem,3vw,1.2rem);font-weight:900;margin:0}
+    .tiny{color:var(--muted);font-size:.9rem}
+    .doors{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(.5rem,2.4vw,1.4rem);margin:1.1rem auto;max-width:850px;perspective:1200px}
+    .door-wrap{text-align:center}
+    .door-stage{
+      position:relative;aspect-ratio:.66;max-height:390px;border-radius:12px 12px 4px 4px;background:#28160e;
+      box-shadow:inset 0 0 0 5px #3b2115,0 12px 24px #0003;overflow:hidden
+    }
+    .behind{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 42%,#fff8d6,#e7d2a8);font-size:clamp(3rem,11vw,7rem)}
+    body.dark .behind{background:radial-gradient(circle at 50% 42%,#3b4358,#1c2538)}
+    .door{
+      position:absolute;inset:0;border:0;border-radius:9px 9px 2px 2px;
+      transform-origin:left center;transform-style:preserve-3d;transition:transform .72s cubic-bezier(.2,.75,.15,1);
+      background:
+       radial-gradient(circle at 82% 52%,#f1c86a 0 2.7%,#8c5e18 3% 4.6%,transparent 5%),
+       linear-gradient(90deg,transparent 0 12%,#5c2d18 12% 15%,transparent 15% 85%,#5c2d18 85% 88%,transparent 88%),
+       linear-gradient(0deg,transparent 0 18%,#5c2d18 18% 21%,transparent 21% 79%,#5c2d18 79% 82%,transparent 82%),
+       linear-gradient(135deg,var(--door),var(--door2));
+      border:5px solid #552b19;box-shadow:inset 0 0 0 3px #c77a45aa;cursor:pointer
+    }
+    .door::before{content:"";position:absolute;inset:12% 15%;border:4px solid #5d311d77;box-shadow:inset 0 0 0 3px #d88c5870}
+    .door.open{transform:rotateY(-105deg)}
+    .door.chosen:not(.open){outline:5px solid var(--gold);outline-offset:-5px;filter:brightness(1.1)}
+    .door.final:not(.open){outline:5px solid var(--accent2);outline-offset:-5px}
+    .door-num{margin-top:.5rem;font-weight:1000;color:var(--muted)}
+    .actions{display:flex;justify-content:center;gap:.7rem;flex-wrap:wrap;margin:.75rem 0}
+    .primary{background:var(--accent);color:white;box-shadow:0 8px 18px color-mix(in srgb,var(--accent) 28%,transparent)}
+    .secondary{background:var(--accent2);color:white}
+    .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+    .result-banner{max-width:680px;margin:.8rem auto 0;padding:.8rem 1rem;border-radius:14px;text-align:center;font-weight:1000}
+    .result-banner.win{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good);border:1px solid color-mix(in srgb,var(--good) 45%,transparent)}
+    .result-banner.lose{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 45%,transparent)}
+    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-top:1rem}
+    .statbox{padding:.85rem;border:1px solid var(--line);border-radius:16px;text-align:center;background:color-mix(in srgb,var(--panel) 75%,var(--bg))}
+    .statbox b{display:block;font-size:1.35rem;margin-top:.25rem}
+    .sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .section-title{margin:.1rem 0 .6rem;font-size:1rem}
+    .numbers,.strategies{display:flex;gap:.5rem;flex-wrap:wrap}
+    .nbtn,.strategy{background:var(--bg);color:var(--ink);border:1px solid var(--line);padding:.7rem .85rem}
+    .nbtn.active,.strategy.active{background:var(--blue);color:white;border-color:transparent}
+    .custom{width:130px;border:1px solid var(--line);border-radius:12px;padding:.65rem;background:var(--bg);color:var(--ink);font-weight:800}
+    .run{margin-top:1rem;width:100%;font-size:1.08rem}
+    .sim-results{margin-top:1.1rem}
+    .bigline{font-size:clamp(1.05rem,4vw,1.35rem);font-weight:1000;text-align:center;margin-bottom:1rem}
+    .bars{display:grid;gap:.8rem}
+    .bar-row{display:grid;grid-template-columns:minmax(92px,120px) 1fr 70px;align-items:center;gap:.65rem;font-weight:850}
+    .track{height:28px;border-radius:999px;background:color-mix(in srgb,var(--line) 50%,transparent);overflow:hidden;position:relative}
+    .fill{height:100%;width:0;border-radius:inherit;transition:width .8s cubic-bezier(.2,.8,.2,1);background:var(--accent2)}
+    .fill.stay{background:var(--blue)} .fill.switch{background:var(--accent)}
+    .theory{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);opacity:.55}
+    .theory::after{content:"teoria";position:absolute;right:3px;top:4px;font-size:.62rem;color:var(--ink);font-weight:900}
+    .pct{text-align:right;font-variant-numeric:tabular-nums}
+    .compare-note{text-align:center;color:var(--muted);font-size:.88rem;margin-top:.7rem}
+    .modal{position:fixed;inset:0;z-index:50;background:#0008;display:grid;place-items:center;padding:1rem}
+    .modal-card{width:min(650px,100%);max-height:85dvh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:1.2rem;box-shadow:0 25px 70px #0007}
+    .modal-card h2{margin-top:0}.modal-card li{margin:.55rem 0;line-height:1.4}
+    .credits{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+    .footer{text-align:center;color:var(--muted);font-size:.78rem;margin-top:1rem}
+    @media(max-width:720px){
+      .sim-grid{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr 1fr}
+      .bar-row{grid-template-columns:88px 1fr 56px}
+    }
+    @media(max-width:430px){
+      main{padding-left:.55rem;padding-right:.55rem}.doors{gap:.32rem}.card{border-radius:19px}
+      .behind{font-size:3.35rem}.door{border-width:4px}.brand{font-size:1rem}.round{width:38px;height:38px}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🚪 MONTY <span>HALL!</span></div>
+    <button class="round" id="themeBtn" aria-label="Giorno o notte">☀️</button>
+    <button class="round" id="soundBtn" aria-label="Suoni">🔊</button>
+    <button class="round" id="fullBtn" aria-label="Tutto schermo">⛶</button>
+    <button class="round" id="infoBtn" aria-label="Informazioni">ⓘ</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Tre porte.<br>Una scelta.</h1>
+      <p>Il cambio di porta sembra inutile… e invece raddoppia la probabilità di vincere. Provalo prima a mano, poi lascia parlare i grandi numeri.</p>
+    </section>
+
+    <nav class="tabs" aria-label="Modalità">
+      <button class="tab active" data-mode="free">🎮 MODALITÀ LIBERA</button>
+      <button class="tab" data-mode="sim">⚡ SIMULAZIONE</button>
+    </nav>
+
+    <section id="freePanel" class="card">
+      <div class="game-head">
+        <p id="instruction" class="instruction">Scegli una porta.</p>
+        <button id="resetStatsBtn" class="nbtn">Azzera statistiche</button>
+      </div>
+      <div class="doors" id="doors"></div>
+      <div id="decisionActions" class="actions hidden">
+        <button id="stayBtn" class="primary">🔒 CONFERMA</button>
+        <button id="switchBtn" class="secondary">🔄 CAMBIA PORTA</button>
+      </div>
+      <div id="nextActions" class="actions hidden">
+        <button id="nextBtn" class="primary">NUOVA PARTITA</button>
+      </div>
+      <div id="resultBanner" class="result-banner hidden"></div>
+
+      <div class="stats">
+        <div class="statbox">🔒 Quando hai mantenuto<b id="stayStats">0 / 0 · —</b></div>
+        <div class="statbox">🔄 Quando hai cambiato<b id="switchStats">0 / 0 · —</b></div>
+      </div>
+    </section>
+
+    <section id="simPanel" class="card hidden">
+      <div class="sim-grid">
+        <div>
+          <h3 class="section-title">Quante prove?</h3>
+          <div class="numbers">
+            <button class="nbtn" data-n="10">10</button>
+            <button class="nbtn" data-n="100">100</button>
+            <button class="nbtn active" data-n="1000">1.000</button>
+            <button class="nbtn" data-n="10000">10.000</button>
+            <input id="customN" class="custom" type="number" min="1" max="1000000" placeholder="Personalizzato">
+          </div>
+        </div>
+        <div>
+          <h3 class="section-title">Quale strategia?</h3>
+          <div class="strategies">
+            <button class="strategy" data-strategy="stay">🔒 Mantieni</button>
+            <button class="strategy" data-strategy="switch">🔄 Cambia</button>
+            <button class="strategy active" data-strategy="compare">⚖️ Confronta</button>
+          </div>
+        </div>
+      </div>
+      <button id="runBtn" class="primary run">▶ AVVIA SIMULAZIONE</button>
+
+      <div id="simResults" class="sim-results hidden">
+        <div id="simHeadline" class="bigline"></div>
+        <div id="bars" class="bars"></div>
+        <div class="compare-note">Le tacche indicano i valori teorici: 33,3% mantenendo e 66,7% cambiando.</div>
+      </div>
+    </section>
+
+    <div class="footer">Esperimento casuale: ogni nuova simulazione produce risultati leggermente diversi.</div>
+  </main>
+
+  <div id="infoModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>Come funziona?</h2>
+      <ol>
+        <li>Scegli una delle tre porte. Dietro una c'è il premio, dietro le altre due una capra.</li>
+        <li>Monty conosce il contenuto delle porte e apre sempre una porta non scelta che contiene una capra.</li>
+        <li>Puoi mantenere la scelta iniziale oppure passare all'unica altra porta rimasta chiusa.</li>
+      </ol>
+      <p><b>Perché conviene cambiare?</b> La prima scelta ha probabilità 1/3 di essere corretta. Le altre due porte, insieme, valgono 2/3. Quando Monty elimina una capra, quel 2/3 si concentra sull'unica porta alternativa rimasta chiusa.</p>
+      <p>Nella simulazione puoi ripetere l'esperimento migliaia di volte e confrontare le frequenze osservate con i valori teorici.</p>
+      <div class="credits">
+        <b>MONTY HALL!</b><br>
+        Idea e progetto didattico: Flavio Naretti.<br>
+        Web app realizzata con ChatGPT · 2026.
+      </div>
+      <div class="actions"><button id="closeInfoBtn" class="primary">CHIUDI</button></div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const state = {
+    prize: 0, first: null, opened: null, final: null, phase: 'pick',
+    sound: localStorage.getItem('mh-sound') !== 'off',
+    stats: JSON.parse(localStorage.getItem('mh-stats') || '{"stay":{"w":0,"n":0},"switch":{"w":0,"n":0}}'),
+    simN: 1000, strategy: 'compare'
+  };
+
+  function tone(freq=440,dur=.08,type='sine',gain=.07){
+    if(!state.sound) return;
+    try{
+      const ac = new (window.AudioContext||window.webkitAudioContext)();
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.type=type;o.frequency.value=freq;g.gain.value=gain;o.connect(g);g.connect(ac.destination);
+      o.start();g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+dur);o.stop(ac.currentTime+dur+.02);
+    }catch(e){}
+  }
+  function revealSound(win){
+    tone(win?740:180,.12,'triangle',.08);
+    setTimeout(()=>tone(win?980:140,.16,'triangle',.07),110);
+  }
+
+  function buildDoors(){
+    const wrap=$('#doors'); wrap.innerHTML='';
+    for(let i=0;i<3;i++){
+      const d=document.createElement('div');
+      d.className='door-wrap';
+      d.innerHTML=`<div class="door-stage"><div class="behind" data-behind="${i}">🐐</div><button class="door" data-door="${i}" aria-label="Porta ${i+1}"></button></div><div class="door-num">PORTA ${i+1}</div>`;
+      wrap.appendChild(d);
+    }
+    $$('.door').forEach(b=>b.addEventListener('click',()=>pickDoor(+b.dataset.door)));
+  }
+
+  function newGame(){
+    state.prize=Math.floor(Math.random()*3); state.first=null; state.opened=null; state.final=null; state.phase='pick';
+    buildDoors();
+    $$('.behind').forEach((b,i)=>b.textContent=i===state.prize?'🏆':'🐐');
+    $('#instruction').textContent='Scegli una porta.';
+    $('#decisionActions').classList.add('hidden'); $('#nextActions').classList.add('hidden');
+    $('#resultBanner').className='result-banner hidden'; $('#resultBanner').textContent='';
+  }
+
+  function pickDoor(i){
+    if(state.phase!=='pick') return;
+    state.first=i; state.phase='decide';
+    const candidates=[0,1,2].filter(x=>x!==i && x!==state.prize);
+    state.opened=candidates[Math.floor(Math.random()*candidates.length)];
+    $$('.door')[i].classList.add('chosen');
+    $('#instruction').textContent=`Hai scelto la porta ${i+1}. Monty apre una porta con una capra…`;
+    tone(320,.08,'square',.035);
+    setTimeout(()=>{
+      $$('.door')[state.opened].classList.add('open');
+      tone(210,.16,'sawtooth',.035);
+      const other=[0,1,2].find(x=>x!==state.first && x!==state.opened);
+      $('#instruction').textContent=`Dietro la porta ${state.opened+1} c'è una capra. Mantieni la ${state.first+1} o passi alla ${other+1}?`;
+      $('#decisionActions').classList.remove('hidden');
+    },420);
+  }
+
+  function finish(strategy){
+    if(state.phase!=='decide') return;
+    state.phase='done';
+    const other=[0,1,2].find(x=>x!==state.first && x!==state.opened);
+    state.final=strategy==='stay'?state.first:other;
+    $$('.door')[state.final].classList.add('final');
+    $$('.door').forEach((d,i)=>{ if(i!==state.opened) setTimeout(()=>d.classList.add('open'), i===state.final?150:420); });
+    const win=state.final===state.prize;
+    state.stats[strategy].n++; if(win) state.stats[strategy].w++;
+    localStorage.setItem('mh-stats',JSON.stringify(state.stats)); updateStats();
+    $('#decisionActions').classList.add('hidden'); $('#nextActions').classList.remove('hidden');
+    const b=$('#resultBanner'); b.className='result-banner '+(win?'win':'lose');
+    b.textContent=win?'🏆 HAI VINTO! Il premio era proprio lì.':'🐐 HAI PERSO! Il premio era dietro la porta '+(state.prize+1)+'.';
+    $('#instruction').textContent=strategy==='stay'?'Hai mantenuto la scelta iniziale.':'Hai cambiato porta.';
+    revealSound(win);
+  }
+
+  function updateStats(){
+    const fmt=s=>s.n?`${s.w} vittorie su ${s.n} · ${(100*s.w/s.n).toFixed(1).replace('.',',')}%`:'0 / 0 · —';
+    $('#stayStats').textContent=fmt(state.stats.stay);
+    $('#switchStats').textContent=fmt(state.stats.switch);
+  }
+
+  function oneTrial(strategy){
+    const prize=Math.floor(Math.random()*3);
+    const first=Math.floor(Math.random()*3);
+    if(strategy==='stay') return first===prize;
+    return first!==prize;
+  }
+  function simulate(strategy,n){
+    let w=0;
+    for(let i=0;i<n;i++) if(oneTrial(strategy)) w++;
+    return {w,n,p:100*w/n};
+  }
+  function bar(label,p,klass,theory){
+    return `<div class="bar-row"><span>${label}</span><div class="track"><div class="fill ${klass}" style="width:${Math.max(0,Math.min(100,p))}%"></div><span class="theory" style="left:${theory}%"></span></div><span class="pct">${p.toFixed(1).replace('.',',')}%</span></div>`;
+  }
+  function runSimulation(){
+    let n=state.simN;
+    const custom=parseInt($('#customN').value,10);
+    if(Number.isFinite(custom) && custom>0) n=Math.min(custom,1000000);
+    const bars=$('#bars'); bars.innerHTML='';
+    $('#simResults').classList.remove('hidden');
+    if(state.strategy==='compare'){
+      const a=simulate('stay',n), b=simulate('switch',n);
+      $('#simHeadline').textContent=`${n.toLocaleString('it-IT')} prove per ciascuna strategia`;
+      bars.innerHTML=bar('🔒 Mantieni',a.p,'stay',33.333)+bar('🔄 Cambia',b.p,'switch',66.667);
+    }else{
+      const r=simulate(state.strategy,n);
+      const label=state.strategy==='stay'?'🔒 Mantieni':'🔄 Cambia';
+      const theory=state.strategy==='stay'?33.333:66.667;
+      $('#simHeadline').textContent=`${n.toLocaleString('it-IT')} prove · ${r.w.toLocaleString('it-IT')} vittorie`;
+      bars.innerHTML=bar(label,r.p,state.strategy,theory)+bar('🐐 Sconfitte',100-r.p,'',100-theory);
+    }
+    tone(520,.08,'triangle',.05);setTimeout(()=>tone(720,.1,'triangle',.05),90);
+  }
+
+  $('#stayBtn').onclick=()=>finish('stay');
+  $('#switchBtn').onclick=()=>finish('switch');
+  $('#nextBtn').onclick=newGame;
+  $('#resetStatsBtn').onclick=()=>{
+    if(confirm('Azzerare tutte le statistiche della modalità libera?')){
+      state.stats={stay:{w:0,n:0},switch:{w:0,n:0}};
+      localStorage.setItem('mh-stats',JSON.stringify(state.stats));updateStats();tone(240,.06);
+    }
+  };
+  $$('.tab').forEach(t=>t.onclick=()=>{
+    $$('.tab').forEach(x=>x.classList.toggle('active',x===t));
+    const free=t.dataset.mode==='free';
+    $('#freePanel').classList.toggle('hidden',!free);$('#simPanel').classList.toggle('hidden',free);
+  });
+  $$('.nbtn[data-n]').forEach(b=>b.onclick=()=>{
+    state.simN=+b.dataset.n;$('#customN').value='';
+    $$('.nbtn[data-n]').forEach(x=>x.classList.toggle('active',x===b));
+  });
+  $('#customN').addEventListener('input',()=>$$('.nbtn[data-n]').forEach(x=>x.classList.remove('active')));
+  $$('.strategy').forEach(b=>b.onclick=()=>{
+    state.strategy=b.dataset.strategy;
+    $$('.strategy').forEach(x=>x.classList.toggle('active',x===b));
+  });
+  $('#runBtn').onclick=runSimulation;
+
+  const darkStored=localStorage.getItem('mh-theme');
+  if(darkStored==='dark' || (!darkStored && matchMedia('(prefers-color-scheme:dark)').matches)) document.body.classList.add('dark');
+  function updateThemeIcon(){ $('#themeBtn').textContent=document.body.classList.contains('dark')?'🌙':'☀️'; }
+  $('#themeBtn').onclick=()=>{
+    document.body.classList.toggle('dark');localStorage.setItem('mh-theme',document.body.classList.contains('dark')?'dark':'light');updateThemeIcon();tone(460,.05);
+  };
+  function updateSoundIcon(){ $('#soundBtn').textContent=state.sound?'🔊':'🔇';}
+  $('#soundBtn').onclick=()=>{state.sound=!state.sound;localStorage.setItem('mh-sound',state.sound?'on':'off');updateSoundIcon();if(state.sound)tone(620,.06);};
+  $('#fullBtn').onclick=async()=>{
+    try{ if(!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen(); }catch(e){}
+  };
+  $('#infoBtn').onclick=()=>$('#infoModal').classList.remove('hidden');
+  $('#closeInfoBtn').onclick=()=>$('#infoModal').classList.add('hidden');
+  $('#infoModal').onclick=e=>{if(e.target.id==='infoModal') $('#infoModal').classList.add('hidden');};
+
+  updateThemeIcon();updateSoundIcon();updateStats();newGame();
+  if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
+})();
+</script>
+</body>
+</html>
