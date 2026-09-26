@@ -1,0 +1,19 @@
+{
+  "name": "MONTY HALL! – Il paradosso delle tre porte",
+  "short_name": "MONTY HALL!",
+  "description": "Gioca e simula il paradosso di Monty Hall.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5efe2",
+  "theme_color": "#14213d",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
