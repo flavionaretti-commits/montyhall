@@ -1,12 +1,25 @@
-# MONTY HALL!
+# PARADOX!
 
-PWA didattica sul paradosso di Monty Hall.
+PWA didattica per esplorare paradossi e problemi controintuitivi attraverso esperimenti interattivi e simulazioni.
 
-## Funzioni
+## Moduli disponibili
+
+### Monty Hall
 - Modalità libera con scelta della porta, apertura della capra e decisione mantieni/cambia.
 - Statistiche separate per le due strategie.
-- Simulazioni da 10, 100, 1.000, 10.000 prove o numero personalizzato.
-- Confronto diretto tra le strategie con grafico a barre e riferimenti teorici.
-- Modalità giorno/notte, suoni, fullscreen e funzionamento offline.
+- Simulazioni ripetute e confronto diretto con i valori teorici.
+
+### Paradosso del compleanno
+- Generazione casuale dei compleanni in gruppi di dimensione variabile.
+- Evidenziazione automatica delle coincidenze.
+- Simulazione di centinaia o migliaia di gruppi.
+- Confronto tra frequenza osservata e probabilità teorica.
+
+## Funzioni comuni
+- Home a moduli espandibile.
+- Modalità giorno/notte.
+- Suoni.
+- Fullscreen.
+- Funzionamento offline come PWA.
 
 Idea e progetto didattico: Flavio Naretti.
