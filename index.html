@@ -519,7 +519,7 @@
     $('#homeBtn').classList.toggle('hidden',name==='home');
     window.scrollTo({top:0,behavior:'smooth'});
   }
-  $('[data-open]').forEach(x=>x.onclick=()=>{setView(x.dataset.open);tone(520,.06,'triangle',.04);});
+  $$('[data-open]').forEach(x=>x.onclick=()=>{setView(x.dataset.open);tone(520,.06,'triangle',.04);});
   $('#homeBtn').onclick=()=>setView('home');
 
   const monthNames=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
@@ -573,17 +573,17 @@
   $('#peopleRange').oninput=updatePeople;
   $('#simPeopleRange').oninput=updateSimPeople;
   $('#generateBirthdaysBtn').onclick=generateBirthdays;
-  $('[data-bday-mode]').forEach(t=>t.onclick=()=>{
-    $('[data-bday-mode]').forEach(x=>x.classList.toggle('active',x===t));
+  $$('[data-bday-mode]').forEach(t=>t.onclick=()=>{
+    $$('[data-bday-mode]').forEach(x=>x.classList.toggle('active',x===t));
     const free=t.dataset.bdayMode==='free';
     $('#bdayFree').classList.toggle('hidden',!free);
     $('#bdaySim').classList.toggle('hidden',free);
   });
-  $('[data-bn]').forEach(x=>x.onclick=()=>{
+  $$('[data-bn]').forEach(x=>x.onclick=()=>{
     bdayState.n=+x.dataset.bn;$('#bdayCustomN').value='';
-    $('[data-bn]').forEach(y=>y.classList.toggle('active',y===x));
+    $$('[data-bn]').forEach(y=>y.classList.toggle('active',y===x));
   });
-  $('#bdayCustomN').oninput=()=>$('[data-bn]').forEach(x=>x.classList.remove('active'));
+  $('#bdayCustomN').oninput=()=>$$('[data-bn]').forEach(x=>x.classList.remove('active'));
   $('#bdayRunBtn').onclick=runBirthday;
 
   const darkStored=localStorage.getItem('mh-theme');
