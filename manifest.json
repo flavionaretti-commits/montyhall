@@ -1,12 +1,12 @@
 {
-  "name": "MONTY HALL! – Il paradosso delle tre porte",
-  "short_name": "MONTY HALL!",
-  "description": "Gioca e simula il paradosso di Monty Hall.",
+  "name": "PARADOX! – Esperimenti controintuitivi",
+  "short_name": "PARADOX!",
+  "description": "Paradossi e problemi controintuitivi esplorati con esperimenti e simulazioni.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f5efe2",
-  "theme_color": "#14213d",
+  "theme_color": "#171a2b",
   "lang": "it",
   "icons": [
     {
