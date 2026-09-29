@@ -85,6 +85,7 @@
     .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
     .result-banner{max-width:680px;margin:.8rem auto 0;padding:.8rem 1rem;border-radius:14px;text-align:center;font-weight:1000}
     .result-banner.win{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good);border:1px solid color-mix(in srgb,var(--good) 45%,transparent)}
+    .result-banner.neutral{background:color-mix(in srgb,var(--blue) 12%,transparent);color:var(--blue);border:1px solid color-mix(in srgb,var(--blue) 38%,transparent)}
     .result-banner.lose{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 45%,transparent)}
     .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-top:1rem}
     .statbox{padding:.85rem;border:1px solid var(--line);border-radius:16px;text-align:center;background:color-mix(in srgb,var(--panel) 75%,var(--bg))}
@@ -494,7 +495,7 @@
     }
   };
   $('.tab[data-mode]').forEach(t=>t.onclick=()=>{
-    $$('.tab').forEach(x=>x.classList.toggle('active',x===t));
+    $('.tab[data-mode]').forEach(x=>x.classList.toggle('active',x===t));
     const free=t.dataset.mode==='free';
     $('#freePanel').classList.toggle('hidden',!free);$('#simPanel').classList.toggle('hidden',free);
   });
