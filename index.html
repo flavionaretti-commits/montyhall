@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#14213d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Monty Hall">
-  <title>MONTY HALL!</title>
+  <meta name="apple-mobile-web-app-title" content="PARADOX!">
+  <title>PARADOX!</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <style>
@@ -159,11 +159,34 @@
       .footer{display:none}
     }
 
+    /* PARADOX! contenitore */
+    .home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;max-width:920px;margin:0 auto}
+    .paradox-card{position:relative;overflow:hidden;text-align:left;border:1px solid var(--line);border-radius:25px;background:var(--panel);color:var(--ink);padding:1.25rem;min-height:225px;cursor:pointer;box-shadow:var(--shadow);transition:.18s transform}
+    .paradox-card:active{transform:scale(.985)}
+    .paradox-icon{font-size:4rem;line-height:1;margin-bottom:1rem}
+    .paradox-card h2{margin:.15rem 0;font-size:1.55rem}
+    .paradox-card p{margin:.5rem 0 0;color:var(--muted);font-weight:650;line-height:1.4}
+    .card-arrow{position:absolute;right:1rem;bottom:1rem;font-size:1.6rem;font-weight:1000;color:var(--accent)}
+    .tag{display:inline-block;margin-top:.8rem;padding:.28rem .55rem;border-radius:999px;background:color-mix(in srgb,var(--accent2) 14%,transparent);color:var(--accent2);font-size:.75rem;font-weight:1000}
+    .future-strip{max-width:920px;margin:1rem auto 0;text-align:center;color:var(--muted);font-size:.88rem}
+    .control-row{display:flex;align-items:center;justify-content:center;gap:.8rem;flex-wrap:wrap;margin:.5rem 0 1rem}
+    .control-row label{font-weight:900}
+    input[type=range]{width:min(420px,78vw);accent-color:var(--accent)}
+    .range-value{min-width:92px;text-align:center;padding:.55rem .75rem;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-weight:1000}
+    .birthdays{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:.55rem;margin:1rem 0}
+    .person{border:1px solid var(--line);border-radius:14px;padding:.62rem;text-align:center;background:var(--bg)}
+    .person small{display:block;color:var(--muted);font-weight:700;margin-bottom:.18rem}
+    .person.match{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,var(--panel));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 18%,transparent)}
+    .birthday-summary{text-align:center;color:var(--muted);font-weight:750}
+    .fill.bday{background:var(--accent)}
+    @media(max-width:720px){.home-grid{grid-template-columns:1fr}}
+
   </style>
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">🚪 MONTY <span>HALL!</span></div>
+    <button class="round hidden" id="homeBtn" aria-label="Home">⌂</button>
+    <div class="brand">🌀 PARADOX<span>!</span></div>
     <button class="round" id="themeBtn" aria-label="Giorno o notte">☀️</button>
     <button class="round" id="soundBtn" aria-label="Suoni">🔊</button>
     <button class="round" id="fullBtn" aria-label="Tutto schermo">⛶</button>
@@ -171,6 +194,29 @@
   </header>
 
   <main>
+    <section id="homeView">
+      <section class="hero">
+        <h1>PARADOX!</h1>
+        <p>Esperimenti interattivi per mettere alla prova l'intuizione. Prima prova, osserva e fai una previsione. Le spiegazioni arrivano dopo.</p>
+      </section>
+      <div class="home-grid">
+        <button class="paradox-card" data-open="monty">
+          <div class="paradox-icon">🚪🐐</div>
+          <h2>Monty Hall</h2>
+          <p>Tre porte, una scelta iniziale e una seconda decisione dopo che una porta viene aperta.</p>
+          <span class="tag">PROBABILITÀ</span><span class="card-arrow">→</span>
+        </button>
+        <button class="paradox-card" data-open="birthday">
+          <div class="paradox-icon">🎂🎈</div>
+          <h2>Compleanno</h2>
+          <p>Quante persone servono perché una coincidenza di compleanno smetta di sembrarti improbabile?</p>
+          <span class="tag">PROBABILITÀ</span><span class="card-arrow">→</span>
+        </button>
+      </div>
+      <div class="future-strip">Nuovi paradossi potranno essere aggiunti qui come moduli indipendenti.</div>
+    </section>
+
+    <section id="montyView" class="hidden">
     <section class="hero">
       <h1>Tre porte.<br>Una scelta.</h1>
       <p>Scegli una porta, osserva cosa succede e prova a capire quale strategia funziona meglio.</p>
@@ -232,24 +278,87 @@
       </div>
     </section>
 
+
     <div class="footer">Esperimento casuale: ogni nuova simulazione produce risultati leggermente diversi.</div>
+    </section>
+
+    <section id="birthdayView" class="hidden">
+      <section class="hero">
+        <h1>🎂 Compleanno</h1>
+        <p>Crea gruppi casuali e osserva quanto spesso compaiono compleanni coincidenti.</p>
+      </section>
+
+      <nav class="tabs" aria-label="Modalità compleanno">
+        <button class="tab active" data-bday-mode="free">🎈 ESPERIMENTO</button>
+        <button class="tab" data-bday-mode="sim">⚡ SIMULAZIONE</button>
+      </nav>
+
+      <section id="bdayFree" class="card">
+        <div class="control-row">
+          <label for="peopleRange">Numero di persone</label>
+          <input id="peopleRange" type="range" min="2" max="60" value="23">
+          <span id="peopleValue" class="range-value">23 persone</span>
+        </div>
+        <div class="actions"><button id="generateBirthdaysBtn" class="primary">🎂 GENERA COMPLEANNI</button></div>
+        <div id="birthdayResult" class="result-banner hidden"></div>
+        <div id="birthdays" class="birthdays"></div>
+        <div id="birthdaySummary" class="birthday-summary">Scegli la dimensione del gruppo e genera i compleanni.</div>
+      </section>
+
+      <section id="bdaySim" class="card hidden">
+        <div class="sim-grid">
+          <div>
+            <h3 class="section-title">Persone nel gruppo</h3>
+            <div class="control-row" style="justify-content:flex-start">
+              <input id="simPeopleRange" type="range" min="2" max="80" value="23">
+              <span id="simPeopleValue" class="range-value">23 persone</span>
+            </div>
+          </div>
+          <div>
+            <h3 class="section-title">Quanti gruppi simulare?</h3>
+            <div class="numbers">
+              <button class="nbtn" data-bn="100">100</button>
+              <button class="nbtn active" data-bn="1000">1.000</button>
+              <button class="nbtn" data-bn="10000">10.000</button>
+              <input id="bdayCustomN" class="custom" type="number" min="1" max="100000" placeholder="Personalizzato">
+            </div>
+          </div>
+        </div>
+        <button id="bdayRunBtn" class="primary run">▶ AVVIA SIMULAZIONE</button>
+        <div id="bdaySimResults" class="sim-results hidden">
+          <div id="bdayHeadline" class="bigline"></div>
+          <div id="bdayBars" class="bars"></div>
+          <div id="bdayTheory" class="compare-note"></div>
+        </div>
+      </section>
+    </section>
+
+    <div class="footer">PARADOX! · esperimenti casuali: ripetendo le simulazioni i risultati possono variare leggermente.</div>
   </main>
+
 
   <div id="infoModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card">
-      <h2>Come funziona?</h2>
-      <ol>
-        <li>Scegli una delle tre porte. Dietro una c'è il premio, dietro le altre due una capra.</li>
-        <li>Monty conosce il contenuto delle porte e apre sempre una porta non scelta che contiene una capra.</li>
-        <li>Puoi mantenere la scelta iniziale oppure passare all'unica altra porta rimasta chiusa.</li>
-      </ol>
-      <p><b>Perché conviene cambiare?</b> All’inizio può sembrare che, rimaste due porte, le probabilità siano 50% e 50%. In realtà la prima scelta ha probabilità 1/3 di essere corretta, mentre le altre due porte, insieme, valgono 2/3. Quando Monty elimina una capra, quel 2/3 si concentra sull’unica porta alternativa rimasta chiusa. Per questo cambiare porta raddoppia la probabilità di vincere.</p>
-      <p>Nella simulazione puoi ripetere l'esperimento migliaia di volte e confrontare le frequenze osservate con i valori teorici.</p>
-      <div class="credits">
-        <b>MONTY HALL!</b><br>
-        Idea e progetto didattico: Flavio Naretti.<br>
-        Web app realizzata con ChatGPT · 2026.
+      <div id="infoHome">
+        <h2>PARADOX!</h2>
+        <p>Una raccolta di esperimenti interattivi dedicati a problemi in cui l'intuizione può portarci fuori strada. L'idea è osservare prima i risultati e leggere la spiegazione matematica solo dopo.</p>
       </div>
+      <div id="infoMonty" class="hidden">
+        <h2>Monty Hall</h2>
+        <ol>
+          <li>Scegli una delle tre porte. Dietro una c'è il premio, dietro le altre due una capra.</li>
+          <li>Monty conosce il contenuto e apre sempre una porta non scelta che contiene una capra.</li>
+          <li>Puoi mantenere la scelta iniziale oppure passare all'unica altra porta rimasta chiusa.</li>
+        </ol>
+        <p><b>Perché conviene cambiare?</b> La prima scelta ha probabilità 1/3 di essere corretta; le altre due porte insieme valgono 2/3. Quando Monty elimina una capra, quel 2/3 si concentra sull'unica porta alternativa rimasta chiusa.</p>
+      </div>
+      <div id="infoBirthday" class="hidden">
+        <h2>Paradosso del compleanno</h2>
+        <p>Il problema chiede quanto sia probabile che, in un gruppo di persone, <b>almeno due</b> condividano il giorno del compleanno. Non cerchiamo una data specifica: ogni coppia possibile può produrre una coincidenza.</p>
+        <p>Si calcola più facilmente la probabilità opposta, cioè che tutti abbiano compleanni diversi: 365/365 × 364/365 × 363/365 × …; poi si sottrae il risultato da 1. Qui trascuriamo il 29 febbraio e supponiamo i 365 giorni equiprobabili.</p>
+        <p>Con 23 persone la probabilità supera già il 50%: nel gruppo esistono 253 coppie possibili.</p>
+      </div>
+      <div class="credits"><b>PARADOX!</b><br>Idea e progetto didattico: Flavio Naretti.<br>Web app realizzata con ChatGPT · 2026.</div>
       <div class="actions"><button id="closeInfoBtn" class="primary">CHIUDI</button></div>
     </div>
   </div>
@@ -258,6 +367,8 @@
 (() => {
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
+  let currentView = 'home';
+  const bdayState = { n: 1000 };
   const state = {
     prize: 0, first: null, opened: null, final: null, phase: 'pick',
     sound: localStorage.getItem('mh-sound') !== 'off',
@@ -382,7 +493,7 @@
       localStorage.setItem('mh-stats',JSON.stringify(state.stats));updateStats();tone(240,.06);
     }
   };
-  $$('.tab').forEach(t=>t.onclick=()=>{
+  $('.tab[data-mode]').forEach(t=>t.onclick=()=>{
     $$('.tab').forEach(x=>x.classList.toggle('active',x===t));
     const free=t.dataset.mode==='free';
     $('#freePanel').classList.toggle('hidden',!free);$('#simPanel').classList.toggle('hidden',free);
@@ -398,6 +509,82 @@
   });
   $('#runBtn').onclick=runSimulation;
 
+
+  function setView(name){
+    currentView=name;
+    $('#homeView').classList.toggle('hidden',name!=='home');
+    $('#montyView').classList.toggle('hidden',name!=='monty');
+    $('#birthdayView').classList.toggle('hidden',name!=='birthday');
+    $('#homeBtn').classList.toggle('hidden',name==='home');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  $('[data-open]').forEach(x=>x.onclick=()=>{setView(x.dataset.open);tone(520,.06,'triangle',.04);});
+  $('#homeBtn').onclick=()=>setView('home');
+
+  const monthNames=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  const monthDays=[31,28,31,30,31,30,31,31,30,31,30,31];
+  function dateLabel(day){
+    let m=0,d=day+1;
+    while(d>monthDays[m]){d-=monthDays[m];m++;}
+    return d+' '+monthNames[m];
+  }
+  function generateBirthdays(){
+    const n=+$('#peopleRange').value,days=[],counts={};
+    for(let i=0;i<n;i++){const d=Math.floor(Math.random()*365);days.push(d);counts[d]=(counts[d]||0)+1;}
+    const repeats=Object.keys(counts).filter(k=>counts[k]>1);
+    $('#birthdays').innerHTML=days.map((d,i)=>'<div class="person '+(counts[d]>1?'match':'')+'"><small>Persona '+(i+1)+'</small><b>'+dateLabel(d)+'</b></div>').join('');
+    const has=repeats.length>0,rb=$('#birthdayResult');
+    rb.className='result-banner '+(has?'win':'neutral');
+    rb.textContent=has?'🎉 COINCIDENZA! Almeno due persone condividono il compleanno.':'Nessuna coincidenza in questo gruppo.';
+    $('#birthdaySummary').textContent=has?repeats.length+' data/e di compleanno ripetuta/e.':'Prova a generare un altro gruppo con lo stesso numero di persone.';
+    tone(has?790:430,.1,'triangle',.05);
+  }
+  function birthdayTheory(n){
+    if(n>365)return 100;
+    let p=1;
+    for(let i=0;i<n;i++)p*=((365-i)/365);
+    return (1-p)*100;
+  }
+  function birthdayTrial(n){
+    if(n>365)return true;
+    const seen=new Uint8Array(365);
+    for(let i=0;i<n;i++){const d=Math.floor(Math.random()*365);if(seen[d])return true;seen[d]=1;}
+    return false;
+  }
+  function bdayBar(label,p,klass,theory){
+    return '<div class="bar-row"><span>'+label+'</span><div class="track"><div class="fill '+klass+'" style="width:'+p+'%"></div><span class="theory" style="left:'+theory+'%"></span></div><span class="pct">'+p.toFixed(1).replace('.',',')+'%</span></div>';
+  }
+  function runBirthday(){
+    const people=+$('#simPeopleRange').value;
+    let n=bdayState.n,custom=parseInt($('#bdayCustomN').value,10);
+    if(Number.isFinite(custom)&&custom>0)n=Math.min(custom,100000);
+    let yes=0;
+    for(let i=0;i<n;i++)if(birthdayTrial(people))yes++;
+    const p=100*yes/n,theory=birthdayTheory(people);
+    $('#bdaySimResults').classList.remove('hidden');
+    $('#bdayHeadline').textContent=n.toLocaleString('it-IT')+' gruppi da '+people+' persone';
+    $('#bdayBars').innerHTML=bdayBar('🎂 Coincidenza',p,'bday',theory)+bdayBar('Nessuna',100-p,'',100-theory);
+    $('#bdayTheory').textContent='Frequenza osservata: '+p.toFixed(1).replace('.',',')+'% · probabilità teorica: '+theory.toFixed(1).replace('.',',')+'%.';
+    tone(700,.09,'triangle',.05);
+  }
+  function updatePeople(){const n=+$('#peopleRange').value;$('#peopleValue').textContent=n+' persone';}
+  function updateSimPeople(){const n=+$('#simPeopleRange').value;$('#simPeopleValue').textContent=n+' persone';}
+  $('#peopleRange').oninput=updatePeople;
+  $('#simPeopleRange').oninput=updateSimPeople;
+  $('#generateBirthdaysBtn').onclick=generateBirthdays;
+  $('[data-bday-mode]').forEach(t=>t.onclick=()=>{
+    $('[data-bday-mode]').forEach(x=>x.classList.toggle('active',x===t));
+    const free=t.dataset.bdayMode==='free';
+    $('#bdayFree').classList.toggle('hidden',!free);
+    $('#bdaySim').classList.toggle('hidden',free);
+  });
+  $('[data-bn]').forEach(x=>x.onclick=()=>{
+    bdayState.n=+x.dataset.bn;$('#bdayCustomN').value='';
+    $('[data-bn]').forEach(y=>y.classList.toggle('active',y===x));
+  });
+  $('#bdayCustomN').oninput=()=>$('[data-bn]').forEach(x=>x.classList.remove('active'));
+  $('#bdayRunBtn').onclick=runBirthday;
+
   const darkStored=localStorage.getItem('mh-theme');
   if(darkStored==='dark' || (!darkStored && matchMedia('(prefers-color-scheme:dark)').matches)) document.body.classList.add('dark');
   function updateThemeIcon(){ $('#themeBtn').textContent=document.body.classList.contains('dark')?'🌙':'☀️'; }
@@ -409,11 +596,15 @@
   $('#fullBtn').onclick=async()=>{
     try{ if(!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen(); }catch(e){}
   };
-  $('#infoBtn').onclick=()=>$('#infoModal').classList.remove('hidden');
+  $('#infoBtn').onclick=()=>{
+    $('#infoHome').classList.add('hidden');$('#infoMonty').classList.add('hidden');$('#infoBirthday').classList.add('hidden');
+    (currentView==='home'?$('#infoHome'):currentView==='monty'?$('#infoMonty'):$('#infoBirthday')).classList.remove('hidden');
+    $('#infoModal').classList.remove('hidden');
+  };
   $('#closeInfoBtn').onclick=()=>$('#infoModal').classList.add('hidden');
   $('#infoModal').onclick=e=>{if(e.target.id==='infoModal') $('#infoModal').classList.add('hidden');};
 
-  updateThemeIcon();updateSoundIcon();updateStats();newGame();
+  updateThemeIcon();updateSoundIcon();updateStats();newGame();updatePeople();updateSimPeople();setView('home');
   if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
 })();
 </script>
