@@ -494,8 +494,8 @@
       localStorage.setItem('mh-stats',JSON.stringify(state.stats));updateStats();tone(240,.06);
     }
   };
-  $('.tab[data-mode]').forEach(t=>t.onclick=()=>{
-    $('.tab[data-mode]').forEach(x=>x.classList.toggle('active',x===t));
+  $$('.tab[data-mode]').forEach(t=>t.onclick=()=>{
+    $$('.tab[data-mode]').forEach(x=>x.classList.toggle('active',x===t));
     const free=t.dataset.mode==='free';
     $('#freePanel').classList.toggle('hidden',!free);$('#simPanel').classList.toggle('hidden',free);
   });
